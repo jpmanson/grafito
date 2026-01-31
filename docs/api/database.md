@@ -21,6 +21,14 @@ db = GrafitoDatabase(
 )
 ```
 
+### In-Memory vs Persistent
+
+- **In-memory** (`:memory:`): Fast and ephemeral; data is lost on close. Great for tests and demos.
+- **Persistent** (file path): Data is stored on disk. Use for production or large datasets.
+
+Tip: For larger datasets, prefer file-backed databases over `:memory:` to avoid
+RAM pressure and to benefit from SQLite’s on-disk optimizations.
+
 ## Context Manager
 
 Use the database as a context manager for automatic transaction handling:
@@ -230,6 +238,22 @@ db.from_networkx(graph)
 # Neo4j dump
 db.import_neo4j_dump('path/to/dump.db')
 ```
+
+### Dump and Restore (Grafito Cypher)
+
+Grafito can dump the entire database to a **Cypher script** and restore it later.
+This is **not** a Neo4j `.dump` file.
+
+```python
+# Dump to a Cypher script
+db.dump('grafito_dump.cypher')
+
+# Restore from a Cypher script
+db.restore('grafito_dump.cypher', clear_existing=True)
+```
+
+The dump script uses a temporary `_dump_id` property to link relationships and
+removes it at the end of the script.
 
 ## Cleanup
 

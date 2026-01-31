@@ -19,7 +19,7 @@ from grafito import GrafitoDatabase
 # Create database
 db = GrafitoDatabase(':memory:')
 
-# Import Neo4j dump
+# Import Neo4j dump (Zstandard DZV1)
 db.import_neo4j_dump('path/to/neo4j.dump')
 
 # Query imported data
@@ -43,8 +43,13 @@ db.close()
 
 | Neo4j Version | Dump Format | Support |
 |--------------|-------------|---------|
-| 4.x | Zstandard compressed | ✅ Full |
-| 5.x | Zstandard compressed | ✅ Full |
+| 4.x | Zstandard `.dump` (DZV1) | ✅ Supported |
+| 5.x | Zstandard `.dump` (DZV1) | ✅ Supported |
+
+Notes:
+- Gzip `.dump` files (DGV1) are **not** supported.
+- The importer expects Neo4j store files with `neostore.*` names inside the dump.
+
 
 ## Low-Level API
 
@@ -55,8 +60,10 @@ For advanced use cases, import components separately.
 ```python
 from grafito.importers import extract_dump
 
-# Extract to directory
+# Extract to directory (Zstandard DZV1 dumps only)
 extract_dump('neo4j.dump', 'extracted/')
+
+# This extractor only pulls files that contain \"neostore\" in their name.
 ```
 
 ### Find Store Directory
