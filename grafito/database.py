@@ -1264,7 +1264,8 @@ class GrafitoDatabase:
                 from .vector_index.faiss import FaissIndex
             except Exception as exc:
                 raise DatabaseError(
-                    "FAISS backend not available. Install with `pip install faiss-cpu` or `faiss-gpu`."
+                    "FAISS backend not available. Install with `pip install grafito[faiss]` "
+                    "or `uv pip install grafito[faiss]`."
                 ) from exc
             return FaissIndex(dim=dim, method=method, options=options)
         if backend == "annoy":
@@ -1272,7 +1273,8 @@ class GrafitoDatabase:
                 from .vector_index.annoy import AnnoyIndexBackend
             except Exception as exc:
                 raise DatabaseError(
-                    "Annoy backend not available. Install with `pip install annoy`."
+                    "Annoy backend not available. Install with `pip install grafito[annoy]` "
+                    "or `uv pip install grafito[annoy]`."
                 ) from exc
             return AnnoyIndexBackend(dim=dim, method=method, options=options)
         if backend == "hnswlib":
@@ -1280,7 +1282,8 @@ class GrafitoDatabase:
                 from .vector_index.hnswlib import HNSWlibIndexBackend
             except Exception as exc:
                 raise DatabaseError(
-                    "hnswlib backend not available. Install with `pip install hnswlib`."
+                    "hnswlib backend not available. Install with `pip install grafito[hnswlib]` "
+                    "or `uv pip install grafito[hnswlib]`."
                 ) from exc
             return HNSWlibIndexBackend(dim=dim, method=method, options=options)
         if backend == "leann":
@@ -1288,7 +1291,8 @@ class GrafitoDatabase:
                 from .vector_index.leann import LeannIndexBackend
             except Exception as exc:
                 raise DatabaseError(
-                    "LEANN backend not available. Install with `pip install leann`."
+                    "LEANN backend not available. Install with `pip install grafito[leann]` "
+                    "or `uv pip install grafito[leann]`."
                 ) from exc
             return LeannIndexBackend(dim=dim, method=method, options=options)
         if backend == "usearch":
@@ -1296,7 +1300,8 @@ class GrafitoDatabase:
                 from .vector_index.usearch import USearchIndexBackend
             except Exception as exc:
                 raise DatabaseError(
-                    "USearch backend not available. Install with `pip install usearch`."
+                    "USearch backend not available. Install with `pip install grafito[usearch]` "
+                    "or `uv pip install grafito[usearch]`."
                 ) from exc
             return USearchIndexBackend(dim=dim, method=method, options=options)
         if backend == "voyager":
@@ -1304,7 +1309,8 @@ class GrafitoDatabase:
                 from .vector_index.voyager import VoyagerIndexBackend
             except Exception as exc:
                 raise DatabaseError(
-                    "Voyager backend not available. Install with `pip install voyager`."
+                    "Voyager backend not available. Install with `pip install grafito[voyager]` "
+                    "or `uv pip install grafito[voyager]`."
                 ) from exc
             return VoyagerIndexBackend(dim=dim, method=method, options=options)
         raise DatabaseError(f"Unsupported vector backend: {backend}")

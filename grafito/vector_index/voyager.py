@@ -13,7 +13,10 @@ import numpy as np
 try:
     from voyager import Index, Space
 except Exception as exc:  # pragma: no cover - optional dependency
-    raise ImportError("voyager is not installed") from exc
+    raise ImportError(
+        "voyager is not installed. Install with `pip install grafito[voyager]` "
+        "or `uv pip install grafito[voyager]`."
+    ) from exc
 
 from .base import VectorIndex
 

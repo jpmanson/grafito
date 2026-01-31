@@ -42,13 +42,38 @@ Grafito is a proof-of-concept demonstrating that SQLite can effectively serve as
 ## Installation
 
 ```bash
-# Clone the repository
-git clone <repository-url>
-cd grafito
+# Install from PyPI
+pip install grafito
+uv pip install grafito
 
 # Install in development mode
+git clone <repository-url>
+cd grafito
 pip install -e ".[dev]"
+uv pip install -e ".[dev]"
 ```
+
+Optional extras:
+
+```bash
+pip install grafito[all]
+uv pip install grafito[all]
+pip install grafito[rdf]
+uv pip install grafito[rdf]
+pip install grafito[viz]
+uv pip install grafito[viz]
+pip install grafito[faiss]
+uv pip install grafito[faiss]
+pip install grafito[hnswlib]
+uv pip install grafito[hnswlib]
+pip install grafito[annoy]
+uv pip install grafito[annoy]
+pip install grafito[leann]
+uv pip install grafito[leann]
+```
+
+Note: `grafito[all]` may fail on some OS/Python combinations depending on native wheels
+for optional backends. In that case, install only the extras you need.
 
 ## Quick Start
 

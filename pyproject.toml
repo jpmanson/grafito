@@ -1,6 +1,6 @@
 [project]
 name = "grafito"
-version = "0.1.1"
+version = "0.1.2"
 description = "SQLite-based Property Graph Database"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -36,6 +36,17 @@ viz = [
     "pyvis>=0.3.2",
 ]
 bm25s = [
+    "bm25s>=0.2.2",
+]
+all = [
+    "faiss-cpu>=1.13.2",
+    "annoy>=1.17.3",
+    "leann>=0.3.6",
+    "hnswlib>=0.8.0",
+    "usearch>=2.0.0",
+    "voyager>=2.0.0",
+    "rdflib>=7.0.0",
+    "pyvis>=0.3.2",
     "bm25s>=0.2.2",
 ]
 dev = [

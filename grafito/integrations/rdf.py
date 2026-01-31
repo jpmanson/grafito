@@ -19,7 +19,10 @@ def export_rdf(
     try:
         from rdflib import Graph, Literal, Namespace, RDF, URIRef
     except ImportError as exc:
-        raise ImportError("rdflib is not installed. Install with `pip install rdflib`.") from exc
+        raise ImportError(
+            "rdflib is not installed. Install with `pip install grafito[rdf]` "
+            "or `uv pip install grafito[rdf]`."
+        ) from exc
     graph = Graph()
     ns = Namespace(base_uri)
     rdf_key = "__rdf__"

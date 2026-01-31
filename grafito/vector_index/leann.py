@@ -16,7 +16,10 @@ except Exception:  # pragma: no cover - optional dependency
     try:
         from leann.api import LeannBuilder, LeannSearcher
     except Exception as exc:  # pragma: no cover - optional dependency
-        raise ImportError("leann is not installed") from exc
+        raise ImportError(
+            "leann is not installed. Install with `pip install grafito[leann]` "
+            "or `uv pip install grafito[leann]`."
+        ) from exc
 
 from .base import VectorIndex
 

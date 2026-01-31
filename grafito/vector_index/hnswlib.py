@@ -9,7 +9,10 @@ import numpy as np
 try:
     import hnswlib
 except Exception as exc:  # pragma: no cover - optional dependency
-    raise ImportError("hnswlib is not installed") from exc
+    raise ImportError(
+        "hnswlib is not installed. Install with `pip install grafito[hnswlib]` "
+        "or `uv pip install grafito[hnswlib]`."
+    ) from exc
 
 from .base import VectorIndex
 

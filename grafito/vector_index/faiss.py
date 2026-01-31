@@ -9,7 +9,10 @@ import numpy as np
 try:
     import faiss
 except Exception as exc:  # pragma: no cover - optional dependency
-    raise ImportError("faiss is not installed") from exc
+    raise ImportError(
+        "faiss is not installed. Install with `pip install grafito[faiss]` "
+        "or `uv pip install grafito[faiss]`."
+    ) from exc
 
 from .base import VectorIndex
 

@@ -8,7 +8,10 @@ from typing import Any
 try:
     import bm25s
 except ImportError as exc:  # pragma: no cover - optional dependency
-    raise ImportError("bm25s is not installed. Install with `pip install bm25s`") from exc
+    raise ImportError(
+        "bm25s is not installed. Install with `pip install grafito[bm25s]` "
+        "or `uv pip install grafito[bm25s]`."
+    ) from exc
 
 from .base import TextIndex
 

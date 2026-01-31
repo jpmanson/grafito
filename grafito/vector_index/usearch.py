@@ -9,7 +9,10 @@ import numpy as np
 try:
     from usearch.index import Index, MetricKind
 except Exception as exc:  # pragma: no cover - optional dependency
-    raise ImportError("usearch is not installed") from exc
+    raise ImportError(
+        "usearch is not installed. Install with `pip install grafito[usearch]` "
+        "or `uv pip install grafito[usearch]`."
+    ) from exc
 
 from .base import VectorIndex
 

@@ -11,7 +11,10 @@ import numpy as np
 try:
     from annoy import AnnoyIndex
 except Exception as exc:  # pragma: no cover - optional dependency
-    raise ImportError("annoy is not installed") from exc
+    raise ImportError(
+        "annoy is not installed. Install with `pip install grafito[annoy]` "
+        "or `uv pip install grafito[annoy]`."
+    ) from exc
 
 from .base import VectorIndex
 

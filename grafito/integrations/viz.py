@@ -9,7 +9,10 @@ def to_pyvis(graph, notebook: bool = True, directed: bool = True, **kwargs: Any)
     try:
         from pyvis.network import Network
     except ImportError as exc:
-        raise ImportError("pyvis is not installed. Install with `pip install pyvis`.") from exc
+        raise ImportError(
+            "pyvis is not installed. Install with `pip install grafito[viz]` "
+            "or `uv pip install grafito[viz]`."
+        ) from exc
     net = Network(notebook=notebook, directed=directed, **kwargs)
     for node_id, attrs in graph.nodes(data=True):
         labels = attrs.get("labels", [])
