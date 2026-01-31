@@ -1,0 +1,3 @@
+{"type":"node","id":"a","labels":["Person"],"properties":{"name":"Alice"}}
+{"type":"node","id":"b","labels":["Person"],"properties":{"name":"Bob"}}
+{"type":"relationship","start":"a","end":"b","label":"KNOWS","properties":{"since":2020}}

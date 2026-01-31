@@ -1,0 +1,59 @@
+[project]
+name = "grafito"
+version = "0.1.0"
+description = "SQLite-based Property Graph Database"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "networkx>=3.6.1",
+    "orjson>=3.11.5",
+    "zstandard>=0.23.0",
+]
+
+[project.optional-dependencies]
+faiss = [
+    "faiss-cpu>=1.13.2",
+]
+annoy = [
+    "annoy>=1.17.3",
+]
+leann = [
+    "leann>=0.3.6",
+]
+hnswlib = [
+    "hnswlib>=0.8.0",
+]
+usearch = [
+    "usearch>=2.0.0",
+]
+voyager = [
+    "voyager>=2.0.0",
+]
+rdf = [
+    "rdflib>=7.0.0",
+]
+viz = [
+    "pyvis>=0.3.2",
+]
+bm25s = [
+    "bm25s>=0.2.2",
+]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-cov>=4.1.0",
+]
+docs = [
+    "mkdocs-material>=9.5.0",
+    "mkdocstrings[python]>=0.24.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_functions = "test_*"
+addopts = "-v --cov=grafito --cov-report=term-missing"
+cache_dir = "tmp_pytest_cache"

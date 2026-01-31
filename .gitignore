@@ -1,0 +1,47 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Testing
+.pytest_cache
+.coverage
+htmlcov/
+
+# Database files
+*.db
+*.db-journal
+
+# IDE
+.vscode/
+.idea/
+
+# Claude
+.claude
+CLAUDE.md
+AGENTS.md
+.grafito/indexes/*
+tmpclaude-*
+.ipynb_checkpoints/*
+.grafito
+context
+chroma
+tmp_coverage/*
+res
+.venv_linux
+examples/Grafito Demo.ipynb
+lib
+tmp_pyvis_test.html
+TODO.md
+debug_neo4j
+tmp_neo4j_extract
+GEMINI.md
+tmp*
+todo
+site

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beers>
+  <beer>
+    <brand>Brand A</brand>
+    <type>Type A</type>
+    <alcohol>5%</alcohol>
+    <brewery>Brewery A</brewery>
+    <timeframe>1900</timeframe>
+  </beer>
+  <beer>
+    <brand>Brand B</brand>
+    <type>Type B</type>
+    <alcohol>6%</alcohol>
+    <brewery>Brewery B</brewery>
+    <timeframe>1950</timeframe>
+  </beer>
+</beers>
