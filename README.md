@@ -1,17 +1,14 @@
 # Grafito
 
-A lightweight, SQLite-based property graph database implementation in Python.
+A fast, embeddable graph database for Python — no server required, SQLite-backed, Cypher-powered, and optional semantic search.
 
-## Overview
+Grafito implements the Property Graph Model (Neo4j-like) with:
 
-Grafito is a proof-of-concept demonstrating that SQLite can effectively serve as a graph database engine. It implements the Property Graph Model (similar to Neo4j) with support for:
-
-- **Nodes** with multiple labels and properties
-- **Directed relationships** with properties
-- **Cypher query language** parser and executor
-- **Pattern matching** and queries
-- **Graph traversal** algorithms (BFS, DFS)
-- **ACID transactions**
+- **Cypher queries** and pattern matching
+- **Vector/semantic search** (optional ANN backends)
+- **Full-text search** (FTS5) and hybrid workflows
+- **RDF/Turtle export** (optional)
+- **Visualization helpers** (optional, via PyVis)
 
 ## Features
 
@@ -28,6 +25,7 @@ Grafito is a proof-of-concept demonstrating that SQLite can effectively serve as
   - Get neighbors (incoming, outgoing, or both directions)
 - **Metadata Queries**: Inspect labels, relationship types, and counts
 - **Full-Text Search (FTS5)**: BM25-ranked keyword search over configured text properties
+- **Semantic/Vector Search**: Optional ANN backends with similarity search and reranker hooks
 - **Transactions**: Full ACID transaction support with context managers
 
 ### Technical Details
@@ -138,7 +136,6 @@ db.close()
 
 Grafito includes a complete Cypher query language parser and executor, allowing you to use Neo4j-style declarative queries alongside the programmatic API.
 
-📋 **[View Full Cypher Coverage Documentation](docs/grafito_cypher_coverage.html)** - Interactive HTML reference with all supported features
 
 ### Basic Usage
 
