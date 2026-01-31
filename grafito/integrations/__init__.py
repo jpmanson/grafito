@@ -1,6 +1,15 @@
 """Optional integrations."""
 
-__all__ = ["export_rdf", "export_turtle", "to_pyvis", "save_pyvis_html"]
+__all__ = [
+    "export_rdf",
+    "export_turtle",
+    "to_pyvis",
+    "save_pyvis_html",
+    "render_graph",
+    "export_graph",
+    "available_viz_backends",
+    "register_viz_backend",
+]
 
 
 def __getattr__(name: str):
@@ -8,12 +17,22 @@ def __getattr__(name: str):
         from .rdf import export_rdf, export_turtle
 
         return export_rdf if name == "export_rdf" else export_turtle
-    if name == "to_pyvis":
-        from .viz import to_pyvis
+    if name in ("to_pyvis", "save_pyvis_html", "render_graph", "export_graph", "available_viz_backends", "register_viz_backend"):
+        from .viz import (
+            to_pyvis,
+            save_pyvis_html,
+            render_graph,
+            export_graph,
+            available_viz_backends,
+            register_viz_backend,
+        )
 
-        return to_pyvis
-    if name == "save_pyvis_html":
-        from .viz import save_pyvis_html
-
-        return save_pyvis_html
+        return {
+            "to_pyvis": to_pyvis,
+            "save_pyvis_html": save_pyvis_html,
+            "render_graph": render_graph,
+            "export_graph": export_graph,
+            "available_viz_backends": available_viz_backends,
+            "register_viz_backend": register_viz_backend,
+        }[name]
     raise AttributeError(f"module {__name__!r} has no attribute {name}")

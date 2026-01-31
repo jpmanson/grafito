@@ -73,6 +73,63 @@ uv pip install grafito[leann]
 Note: `grafito[all]` may fail on some OS/Python combinations depending on native wheels
 for optional backends. In that case, install only the extras you need.
 
+PyVis visualization helpers (node labels + colors + physics presets):
+
+```python
+from grafito.integrations import save_pyvis_html, available_viz_backends
+
+print(available_viz_backends())
+
+graph = db.to_networkx()
+save_pyvis_html(
+    graph,
+    path="grafito_graph.html",
+    node_label="name",
+    color_by_label=True,
+    physics="compact",  # or "spread"
+)
+```
+
+D2 export (text) and optional render via CLI:
+
+```python
+from grafito.integrations import export_graph
+
+graph = db.to_networkx()
+export_graph(graph, "graph.d2", backend="d2", node_label="label_and_name")
+# If you have the `d2` CLI installed:
+export_graph(graph, "graph.d2", backend="d2", render="svg")
+```
+
+Note: the D2 renderer is a separate CLI (`brew install d2` on macOS). The Python
+package does not bundle it.
+
+Mermaid export (text) and optional render via mermaid-cli:
+
+```python
+from grafito.integrations import export_graph
+
+graph = db.to_networkx()
+export_graph(graph, "graph.mmd", backend="mermaid", node_label="label_and_name")
+# If you have mermaid-cli installed:
+export_graph(graph, "graph.mmd", backend="mermaid", render="svg")
+```
+
+Note: Mermaid rendering requires `mmdc` (`npm i -g @mermaid-js/mermaid-cli`).
+
+Graphviz DOT export (text) and optional render via `dot`:
+
+```python
+from grafito.integrations import export_graph
+
+graph = db.to_networkx()
+export_graph(graph, "graph.dot", backend="graphviz", node_label="label_and_name")
+# If you have Graphviz installed:
+export_graph(graph, "graph.dot", backend="graphviz", render="svg")
+```
+
+Note: Graphviz rendering requires `dot` (`brew install graphviz`).
+
 ## Quick Start
 
 ```python
@@ -451,7 +508,7 @@ save_pyvis_html(graph, path="grafito_graph.html")
 ```
 
 FAISS GPU note:
-- On Python 3.12 we use `faiss-cpu` because PyPI `faiss-gpu` wheels are not available. See [faiss docs](https://github.com/facebookresearch/faiss?tab=readme-ov-file#installing)
+- We use `faiss-cpu` because PyPI `faiss-gpu` wheels are not available. See [faiss docs](https://github.com/facebookresearch/faiss?tab=readme-ov-file#installing)
 - GPU support typically requires a Conda install, which is more complex in this environment.
 
 HNSWlib note:
