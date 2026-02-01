@@ -110,6 +110,8 @@ export_graph(
 # Generates graph.svg
 ```
 
+Note: The D2 renderer is a separate CLI and is not bundled with Grafito.
+
 ## Mermaid
 
 Mermaid is supported in Markdown and many documentation platforms.
@@ -146,6 +148,8 @@ export_graph(
     render='svg'
 )
 ```
+
+Note: Mermaid rendering requires `mmdc` (`npm i -g @mermaid-js/mermaid-cli`).
 
 ## Graphviz (DOT)
 
@@ -185,6 +189,41 @@ export_graph(
 )
 ```
 
+Note: Graphviz rendering requires the `dot` CLI (`brew install graphviz`).
+
+## D3 (Self-Contained HTML)
+
+D3 export produces a standalone HTML file (no build step).
+
+```python
+from grafito.integrations import export_graph
+
+graph = db.to_networkx()
+export_graph(
+    graph,
+    'graph.html',
+    backend='d3',
+    node_label='label_and_name'
+)
+```
+
+## Cytoscape.js (Self-Contained HTML)
+
+Cytoscape export produces a standalone HTML file (no build step).
+
+```python
+from grafito.integrations import export_graph
+
+graph = db.to_networkx()
+export_graph(
+    graph,
+    'graph.html',
+    backend='cytoscape',
+    node_label='label_and_name',
+    layout='cose'
+)
+```
+
 ## Comparison
 
 | Backend | Output | Interactive | Best For |
@@ -193,6 +232,8 @@ export_graph(
 | **D2** | Text/SVG | ❌ No | Documentation, version control |
 | **Mermaid** | Markdown/SVG | ⚠️ Partial | READMEs, docs integration |
 | **Graphviz** | PNG/SVG/PDF | ❌ No | Publications, static diagrams |
+| **D3** | HTML | ✅ Yes | Custom web views |
+| **Cytoscape** | HTML | ✅ Yes | Large graphs, rich UI |
 
 ## Backend Availability
 
@@ -200,7 +241,7 @@ export_graph(
 from grafito.integrations import available_viz_backends
 
 print(available_viz_backends())
-# ['pyvis', 'd2', 'mermaid', 'graphviz']
+# ['cytoscape', 'd2', 'd3', 'graphviz', 'mermaid', 'pyvis']
 ```
 
 ## Large Graph Handling

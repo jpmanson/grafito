@@ -81,6 +81,7 @@ nav:
       - Relationships: api/relationships.md
       - Transactions: api/transactions.md
       - Graph Traversal: api/traversal.md
+      - Cypher API: api/cypher.md
 
   - Cypher Query Language:
       - Overview: cypher/overview.md
