@@ -38,7 +38,7 @@ Read the full documentation at: https://jpmanson.github.io/grafito/
 
 - **Storage**: SQLite with normalized schema
 - **Data Model**: Property Graph Model (Neo4j-compatible concepts)
-- **Python Version**: 3.13+
+- **Python Version**: 3.11+
 - **Dependencies**: None (uses standard library only)
 - **Performance**: Efficient indexing on relationships and labels
 - **Text Search**: SQLite FTS5 virtual tables with BM25 ranking (requires FTS5-enabled SQLite build)
