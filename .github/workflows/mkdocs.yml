@@ -24,7 +24,7 @@ jobs:
         run: pip install uv
 
       - name: Install docs deps
-        run: uv pip install -e ".[docs]"
+        run: uv pip install --system -e ".[docs]"
 
       - name: Build site
         run: uv run mkdocs build
