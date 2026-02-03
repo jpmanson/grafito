@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from typing import Any, Callable, Protocol
+import math
 import json
 import shutil
 import subprocess
@@ -182,6 +183,8 @@ def plot_matplotlib(
     color_map: dict[str, str] | None = None,
     node_size: int | list[int] = 600,
     node_size_attr: str | None = None,
+    node_size_scale: float = 100.0,
+    node_size_fallback: float = 600.0,
     node_alpha: float = 0.9,
     node_shape: str = "o",
     node_edge_color: str = "#333333",
@@ -192,12 +195,19 @@ def plot_matplotlib(
     edge_width: float = 1.5,
     edge_style: str = "solid",
     edge_arrow_size: int = 15,
+    # Edge labels
+    show_edge_labels: bool = True,
+    edge_label_attr: str = "type",
+    edge_label_fn: Callable[[Any, Any, int | None, dict[str, Any]], str] | None = None,
+    edge_font_size: int = 9,
+    edge_font_color: str = "#556",
+    edge_label_rotate: bool = True,
     # Label styling
     font_size: int = 10,
     font_color: str = "#1b1f23",
     font_weight: str = "normal",
     show_labels: bool = True,
-    label_offset: tuple[float, float] = (0, 0.05),
+    label_offset: tuple[float, float] | str = (0, 0.05),
     # Legend
     show_legend: bool = True,
     legend_loc: str = "upper left",
@@ -240,6 +250,8 @@ def plot_matplotlib(
         color_map: Dictionary mapping label values to colors
         node_size: Size of nodes (single value or list)
         node_size_attr: Property to use for sizing nodes
+        node_size_scale: Scale factor for node_size_attr-derived sizes
+        node_size_fallback: Fallback size when node_size_attr values are invalid
         node_alpha: Node transparency (0-1)
         node_shape: Node shape marker (Matplotlib style, e.g., 'o', 's', '^')
         node_edge_color: Color of node borders
@@ -249,11 +261,17 @@ def plot_matplotlib(
         edge_width: Width of edges
         edge_style: Edge line style ('solid', 'dashed', 'dotted', etc.)
         edge_arrow_size: Size of arrow heads for directed graphs
+        show_edge_labels: Whether to display edge labels
+        edge_label_attr: Attribute to use for edge labels
+        edge_label_fn: Custom function (source, target, key, attrs) -> str for edge labels
+        edge_font_size: Font size for edge labels
+        edge_font_color: Color for edge labels
+        edge_label_rotate: Rotate edge labels to align with edge direction
         font_size: Font size for node labels
         font_color: Color of node labels
         font_weight: Font weight for labels ('normal', 'bold', etc.)
         show_labels: Whether to display node labels
-        label_offset: Offset for labels as (x, y) fraction
+        label_offset: Offset for labels as (x, y) fraction or "auto"
         show_legend: Whether to show a legend for node colors
         legend_loc: Legend location (Matplotlib style)
         legend_bbox_to_anchor: Legend anchor position
@@ -286,6 +304,9 @@ def plot_matplotlib(
         ...     figsize=(12, 10),
         ...     color_by_label=True,
         ...     node_size=800,
+        ...     node_size_scale=80,
+        ...     node_size_fallback=500,
+        ...     show_edge_labels=True,
         ...     title="My Social Network"
         ... )
     """
@@ -320,6 +341,7 @@ def plot_matplotlib(
     # Resolve node colors
     palette = palette or _DEFAULT_COLORS
     label_colors: dict[str, str] = {}
+    legend_colors: dict[str, str] = {}
 
     def pick_label_color(labels: list[str]) -> str:
         if not labels:
@@ -335,15 +357,26 @@ def plot_matplotlib(
             unique_values: set[str] = set()
             for _, attrs in graph.nodes(data=True):
                 props = attrs.get("properties", {})
-                val = props.get(color_attr) or attrs.get(color_attr, "")
-                if val:
+                if color_attr in props:
+                    val = props.get(color_attr)
+                else:
+                    val = attrs.get(color_attr)
+                if val is not None:
                     unique_values.add(str(val))
             value_colors = {v: palette[i % len(palette)] for i, v in enumerate(sorted(unique_values))}
+            legend_colors = dict(value_colors)
             node_color = []
             for _, attrs in graph.nodes(data=True):
                 props = attrs.get("properties", {})
-                val = props.get(color_attr) or attrs.get(color_attr, "")
-                mapped = color_map.get(str(val), value_colors.get(str(val), palette[0])) if color_map else value_colors.get(str(val), palette[0])
+                if color_attr in props:
+                    val = props.get(color_attr)
+                else:
+                    val = attrs.get(color_attr)
+                mapped = value_colors.get(str(val), palette[0])
+                if color_map:
+                    mapped = color_map.get(str(val), mapped)
+                    if val is not None:
+                        legend_colors[str(val)] = mapped
                 node_color.append(mapped)
         elif color_by_label:
             node_color = []
@@ -351,23 +384,36 @@ def plot_matplotlib(
                 labels = attrs.get("labels", [])
                 if color_map and labels:
                     color = color_map.get(labels[0], pick_label_color(labels))
+                    legend_colors[labels[0]] = color
                 else:
                     color = pick_label_color(labels)
+                    if labels:
+                        legend_colors[labels[0]] = color
                 node_color.append(color)
         else:
             node_color = palette[0]
 
     # Resolve node sizes
+    node_size_by_node: dict[Any, float] | None = None
     if node_size_attr:
         sizes = []
-        for _, attrs in graph.nodes(data=True):
+        for node_id, attrs in graph.nodes(data=True):
             props = attrs.get("properties", {})
-            val = props.get(node_size_attr) or attrs.get(node_size_attr, 1)
+            if node_size_attr in props:
+                val = props.get(node_size_attr)
+            else:
+                val = attrs.get(node_size_attr, 1)
             try:
-                sizes.append(float(val) * 100)
+                sizes.append(float(val) * node_size_scale)
             except (ValueError, TypeError):
-                sizes.append(600)
+                sizes.append(node_size_fallback)
         node_size = sizes
+        node_size_by_node = {node_id: float(size) for node_id, size in zip(graph.nodes(), sizes)}
+    elif isinstance(node_size, (list, tuple)):
+        node_size_by_node = {
+            node_id: float(size)
+            for node_id, size in zip(graph.nodes(), node_size)
+        }
 
     # Create figure
     fig, ax = plt.subplots(figsize=figsize, dpi=dpi, facecolor=bgcolor)
@@ -375,6 +421,13 @@ def plot_matplotlib(
 
     # Draw edges
     is_directed = graph.is_directed() if hasattr(graph, "is_directed") else False
+    edge_kwargs = {
+        k: v
+        for k, v in kwargs.items()
+        if k.startswith("edge_")
+        and not k.startswith("edge_label_")
+        and k not in {"edge_color", "edge_alpha", "edge_width", "edge_style"}
+    }
     if is_directed:
         nx.draw_networkx_edges(
             graph,
@@ -386,7 +439,7 @@ def plot_matplotlib(
             style=edge_style,
             arrows=True,
             arrowsize=edge_arrow_size,
-            **{k: v for k, v in kwargs.items() if k.startswith("edge_")},
+            **edge_kwargs,
         )
     else:
         nx.draw_networkx_edges(
@@ -397,7 +450,7 @@ def plot_matplotlib(
             alpha=edge_alpha,
             width=edge_width,
             style=edge_style,
-            **{k: v for k, v in kwargs.items() if k.startswith("edge_")},
+            **edge_kwargs,
         )
 
     # Draw nodes
@@ -416,6 +469,52 @@ def plot_matplotlib(
         ]},
     )
 
+    # Draw edge labels
+    if show_edge_labels:
+        edge_labels = {}
+        is_multi = graph.is_multigraph() if hasattr(graph, "is_multigraph") else False
+        if is_multi:
+            for source, target, key, attrs in graph.edges(keys=True, data=True):
+                if edge_label_fn:
+                    label = edge_label_fn(source, target, key, attrs)
+                else:
+                    label = attrs.get(edge_label_attr, "")
+                edge_labels[(source, target, key)] = str(label)
+        else:
+            for source, target, attrs in graph.edges(data=True):
+                if edge_label_fn:
+                    label = edge_label_fn(source, target, None, attrs)
+                else:
+                    label = attrs.get(edge_label_attr, "")
+                edge_labels[(source, target)] = str(label)
+
+        edge_label_kwargs = {
+            k[len("edge_label_"):]: v
+            for k, v in kwargs.items()
+            if k.startswith("edge_label_")
+        }
+        nx.draw_networkx_edge_labels(
+            graph,
+            pos,
+            edge_labels=edge_labels,
+            ax=ax,
+            font_size=edge_font_size,
+            font_color=edge_font_color,
+            rotate=edge_label_rotate,
+            **edge_label_kwargs,
+        )
+
+    # Pre-compute limits for label transforms
+    xlim = None
+    ylim = None
+    if pos:
+        xlim = (min(x for x, y in pos.values()) - margins[0],
+                max(x for x, y in pos.values()) + margins[0])
+        ylim = (min(y for x, y in pos.values()) - margins[1],
+                max(y for x, y in pos.values()) + margins[1])
+        ax.set_xlim(xlim)
+        ax.set_ylim(ylim)
+
     # Draw labels
     if show_labels:
         labels = {}
@@ -423,7 +522,22 @@ def plot_matplotlib(
             labels[node_id] = _resolve_node_label(node_id, attrs, node_label, label_attr, label_fn)
 
         # Apply label offset
-        if label_offset != (0, 0):
+        if label_offset == "auto":
+            offset_pos = {}
+            for node, (x, y) in pos.items():
+                size = node_size_by_node.get(node, node_size_fallback) if node_size_by_node else node_size
+                try:
+                    size_val = float(size)
+                except (ValueError, TypeError):
+                    size_val = node_size_fallback
+                radius_pts = math.sqrt(max(size_val, 0.0)) / 2.0
+                text_half_pts = max(1.0, float(font_size) * 0.6)
+                pad_pts = 3.8 + min(9.0, radius_pts * 0.4)
+                total_pts = radius_pts + text_half_pts + pad_pts
+                x_disp, y_disp = ax.transData.transform((x, y))
+                x_data, y_data = ax.transData.inverted().transform((x_disp, y_disp + total_pts))
+                offset_pos[node] = (x_data, y_data)
+        elif label_offset != (0, 0):
             offset_pos = {
                 node: (x + label_offset[0], y + label_offset[1])
                 for node, (x, y) in pos.items()
@@ -442,12 +556,12 @@ def plot_matplotlib(
         )
 
     # Add legend
-    if show_legend and label_colors:
+    if show_legend and (legend_colors or label_colors):
         from matplotlib.patches import Patch
 
         legend_elements = [
             Patch(facecolor=color, edgecolor=node_edge_color, label=label)
-            for label, color in sorted(label_colors.items())
+            for label, color in sorted((legend_colors or label_colors).items())
         ]
         if legend_bbox_to_anchor:
             ax.legend(
@@ -466,10 +580,9 @@ def plot_matplotlib(
     # Configure axes
     if not show_axes:
         ax.axis("off")
-    ax.set_xlim([min(x for x, y in pos.values()) - margins[0],
-                 max(x for x, y in pos.values()) + margins[0]])
-    ax.set_ylim([min(y for x, y in pos.values()) - margins[1],
-                 max(y for x, y in pos.values()) + margins[1]])
+    if xlim and ylim:
+        ax.set_xlim(xlim)
+        ax.set_ylim(ylim)
 
     plt.tight_layout()
 

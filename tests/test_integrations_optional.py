@@ -160,6 +160,38 @@ def test_plot_matplotlib_requires_matplotlib():
     assert hasattr(fig, "axes")
 
 
+def test_plot_matplotlib_handles_empty_graph():
+    pytest.importorskip("matplotlib")
+    from grafito.integrations import plot_matplotlib
+    import networkx as nx
+
+    graph = nx.Graph()
+    fig = plot_matplotlib(graph, return_fig=True, show_labels=False)
+    assert fig is not None
+
+
+def test_plot_matplotlib_edge_labels_and_size_scaling():
+    pytest.importorskip("matplotlib")
+    from grafito.integrations import plot_matplotlib
+
+    db = GrafitoDatabase(":memory:")
+    alice = db.create_node(labels=["Person"], properties={"name": "Alice", "size": 2})
+    bob = db.create_node(labels=["Person"], properties={"name": "Bob", "size": "bad"})
+    db.create_relationship(alice.id, bob.id, "KNOWS")
+    graph = db.to_networkx()
+
+    fig = plot_matplotlib(
+        graph,
+        return_fig=True,
+        node_size_attr="size",
+        node_size_scale=50,
+        node_size_fallback=400,
+        show_edge_labels=True,
+        edge_label_attr="type",
+    )
+    assert fig is not None
+
+
 def test_save_matplotlib():
     pytest.importorskip("matplotlib")
     from grafito.integrations import save_matplotlib
