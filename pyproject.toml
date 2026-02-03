@@ -40,6 +40,10 @@ bm25s = [
 ]
 d2 = [
 ]
+netgraph = [
+    "netgraph>=4.13.0",
+    "matplotlib>=3.8.0",
+]
 all = [
     "faiss-cpu>=1.13.2",
     "annoy>=1.17.3",
@@ -50,6 +54,8 @@ all = [
     "rdflib>=7.0.0",
     "pyvis>=0.3.2",
     "bm25s>=0.2.2",
+    "netgraph>=4.13.0",
+    "matplotlib>=3.8.0",
 ]
 dev = [
     "pytest>=8.0.0",
