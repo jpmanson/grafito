@@ -1,5 +1,10 @@
 # GrafitoDB
 
+![Tests](https://github.com/jpmanson/GrafitoDB/actions/workflows/tests.yml/badge.svg)
+![Publish](https://github.com/jpmanson/GrafitoDB/actions/workflows/python-publish.yml/badge.svg)
+![Docs](https://github.com/jpmanson/GrafitoDB/actions/workflows/mkdocs.yml/badge.svg)
+![Coverage](https://codecov.io/gh/jpmanson/GrafitoDB/branch/main/graph/badge.svg)
+
 A fast, embeddable graph database for Python — no server required, SQLite-backed, Cypher-powered, and optional semantic search.
 
 ![GrafitoDB Logo](https://raw.githubusercontent.com/jpmanson/GrafitoDB/main/images/grafito_logo.png)
