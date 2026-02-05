@@ -577,20 +577,22 @@ def plot_matplotlib(
 
         # Apply label offset
         if label_offset == "auto":
+            # Calculate offset based on graph extent and node size
+            y_range = ylim[1] - ylim[0] if ylim else 1.0
+            # Base offset as fraction of y range, scaled by sqrt of node size
+            base_size = node_size if isinstance(node_size, (int, float)) else node_size_fallback
+            # Offset = 2-4% of y range depending on node size
+            base_offset = y_range * (0.02 + 0.015 * math.sqrt(base_size) / 30)
             offset_pos = {}
             for node, (x, y) in pos.items():
-                size = node_size_by_node.get(node, node_size_fallback) if node_size_by_node else node_size
+                size = node_size_by_node.get(node, base_size) if node_size_by_node else base_size
                 try:
                     size_val = float(size)
                 except (ValueError, TypeError):
-                    size_val = node_size_fallback
-                radius_pts = math.sqrt(max(size_val, 0.0)) / 2.0
-                text_half_pts = max(1.0, float(font_size) * 0.6)
-                pad_pts = 3.8 + min(9.0, radius_pts * 0.4)
-                total_pts = radius_pts + text_half_pts + pad_pts
-                x_disp, y_disp = ax.transData.transform((x, y))
-                x_data, y_data = ax.transData.inverted().transform((x_disp, y_disp + total_pts))
-                offset_pos[node] = (x_data, y_data)
+                    size_val = base_size
+                # Scale offset slightly by individual node size
+                scale = math.sqrt(size_val / base_size) if base_size > 0 else 1.0
+                offset_pos[node] = (x, y + base_offset * scale)
         elif label_offset != (0, 0):
             offset_pos = {
                 node: (x + label_offset[0], y + label_offset[1])
@@ -1356,6 +1358,8 @@ def graph_to_netgraph(
     node_label: str = "id",
     label_attr: str | None = None,
     label_fn: Callable[[Any, dict[str, Any]], str] | None = None,
+    # Edge labels
+    edge_label_fn: Callable[[Any, Any, dict[str, Any]], str] | None = None,
     # Colors
     color_by_label: bool = True,
     palette: list[str] | None = None,
@@ -1382,7 +1386,8 @@ def graph_to_netgraph(
         graph: A NetworkX graph (MultiDiGraph will be converted to DiGraph).
         node_label: How to label nodes: "id", "name", "labels", or "label_and_name".
         label_attr: Specific attribute to use as label.
-        label_fn: Custom function to compute labels.
+        label_fn: Custom function to compute node labels.
+        edge_label_fn: Custom function (source, target, attrs) -> str for edge labels.
         color_by_label: Assign colors based on node labels.
         palette: List of colors for color_by_label.
         default_color: Default node color.
@@ -1472,10 +1477,16 @@ def graph_to_netgraph(
     edge_labels = {}
     if isinstance(graph, nx.DiGraph):
         for source, target, attrs in graph.edges(data=True):
-            edge_labels[(source, target)] = attrs.get("type", "RELATED_TO")
+            if edge_label_fn:
+                edge_labels[(source, target)] = edge_label_fn(source, target, attrs)
+            else:
+                edge_labels[(source, target)] = attrs.get("type", "RELATED_TO")
     else:
         for u, v, attrs in graph.edges(data=True):
-            edge_labels[(u, v)] = attrs.get("type", "RELATED_TO")
+            if edge_label_fn:
+                edge_labels[(u, v)] = edge_label_fn(u, v, attrs)
+            else:
+                edge_labels[(u, v)] = attrs.get("type", "RELATED_TO")
 
     # Create figure if not provided
     created_fig = False
